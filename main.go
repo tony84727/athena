@@ -22,9 +22,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//connect.Send(&forgegrpc.Message{
-	//	Content:"grpc已連線",
-	//})
+	out := make(chan string, 10)
+	defer close(out)
+	go func() {
+		for msg := range out {
+			connect.Send(&forgegrpc.Message{
+				Content: msg,
+			})
+		}
+	}()
 	go func() {
 		reader := bufio.NewReader(os.Stdin)
 		for {
@@ -32,17 +38,19 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			connect.Send(&forgegrpc.Message{
-				Content: string(input),
-			})
+			out <- string(input)
 		}
-
 	}()
 	for {
 		e, err := connect.Recv()
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("sender: %s, message: %s\n", e.Sender, e.Content)
+		sender, content := decodeChatEvent(e)
+		fmt.Printf("sender: %s, message: %s\n", sender, content)
+		expressions := extractMathExpressions(content)
+		for _, e := range expressions {
+			log.Printf("expression detected: %s\n", e)
+		}
 	}
 }
