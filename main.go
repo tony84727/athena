@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"github.com/Knetic/govaluate"
 	"github.com/tony84727/athena/forgegrpc"
 	"google.golang.org/grpc"
 	"log"
@@ -48,9 +49,22 @@ func main() {
 		}
 		sender, content := decodeChatEvent(e)
 		fmt.Printf("sender: %s, message: %s\n", sender, content)
+		if sender == "tony84727" {
+			continue
+		}
 		expressions := extractMathExpressions(content)
 		for _, e := range expressions {
-			log.Printf("expression detected: %s\n", e)
+			expr, err  := govaluate.NewEvaluableExpression(e)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			result, err := expr.Eval(nil)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			out <- fmt.Sprintf("%s => %v",e, result)
 		}
 	}
 }
