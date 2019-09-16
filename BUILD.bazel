@@ -24,6 +24,7 @@ go_library(
     name = "go_default_library",
     srcs = [
         "commander.go",
+        "commands.go",
         "decode.go",
         "main.go",
         "math.go",
@@ -32,6 +33,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         ":forge_grpc_go_library",
+        "@com_github_gempir_go_twitch_irc//:go_default_library",
         "@com_github_knetic_govaluate//:go_default_library",
         "@org_golang_google_grpc//:go_default_library",
     ],

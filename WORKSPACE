@@ -222,3 +222,10 @@ go_repository(
     sum = "h1:7o6+MAPhYTCF0+fdvoz1xDedhRb4f6s9Tn1Tt7/WTEg=",
     version = "v3.0.0+incompatible",
 )
+
+go_repository(
+    name = "com_github_gempir_go_twitch_irc",
+    importpath = "github.com/gempir/go-twitch-irc",
+    sum = "h1:Q9gQGI/3yJzYwlYDlFsGJzWfpaqubMExfmBXNpOC6W0=",
+    version = "v1.1.0",
+)
