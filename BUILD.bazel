@@ -23,6 +23,7 @@ go_proto_library(
 go_library(
     name = "go_default_library",
     srcs = [
+        "commander.go",
         "decode.go",
         "main.go",
         "math.go",
