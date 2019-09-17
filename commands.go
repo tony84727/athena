@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Knetic/govaluate"
 	"github.com/gempir/go-twitch-irc"
+	"github.com/spf13/viper"
 	"log"
 	"os"
 	"strings"
@@ -14,6 +15,7 @@ type CCommand struct {
 }
 
 func (CCommand) Run(out chan<- string, args string) {
+	defer close(out)
 	exprStr := strings.TrimSpace(args)
 	expr, err := govaluate.NewEvaluableExpression(exprStr)
 	if err != nil {
@@ -35,17 +37,45 @@ func (CCommand) Run(out chan<- string, args string) {
 type TwitchCommand struct {
 	client *twitch.Client
 	channel string
+	out chan<- string
 }
 
 func (c *TwitchCommand) Run(out chan<- string, args string) {
-	//if len(c.channel) > 0 {
-	//	c.client.Depart(c.channel)
-	//}
-	//c.client.Join(strings.TrimSpace(args))
-	//c.client.OnNewMessage(func(channel string, user twitch.User, message twitch.Message) {
-	//	if channel == c.channel
-	//})
-	panic("not implemented")
+	if c.client == nil {
+		c.client = twitch.NewClient(viper.GetString("twitch.username"), viper.GetString("twitch.secret"))
+		if err := c.client.Connect(); err != nil {
+			log.Println("cannot connect to twitch")
+			log.Println(err)
+			return
+		}
+	}
+	if c.out != nil {
+		close(out)
+	} else {
+		c.out = out
+	}
+	arguments := strings.Split(args, " ")
+	if len(arguments) <= 0 {
+		c.out <- "錯誤的使用方式"
+		return
+	}
+	switch arguments[0] {
+	case "join":
+		if len(c.channel) > 0 {
+			c.client.Depart(c.channel)
+		}
+		channel := strings.TrimSpace(arguments[1])
+		c.client.Join(channel)
+		c.channel = channel
+	case "out":
+		if len(c.channel) <= 0 {
+			return
+		}
+		c.client.Depart(c.channel)
+		c.channel = ""
+	default:
+		c.out <- "錯誤的使用方式"
+	}
 }
 
 func NewTwitchCommand() *TwitchCommand {

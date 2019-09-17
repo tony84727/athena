@@ -38,10 +38,7 @@ func (c *Commander) Run(input <-chan string, out chan<- string) {
 						out <- s
 					}
 				}()
-				go func() {
-					defer close(commandOutput)
-					cmd.Run(out, matches[2])
-				}()
+				go cmd.Run(out, matches[2])
 			}
 		}
 	}
