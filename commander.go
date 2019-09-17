@@ -38,7 +38,7 @@ func (c *Commander) Run(input <-chan string, out chan<- string) {
 						out <- s
 					}
 				}()
-				go cmd.Run(out, matches[2])
+				go cmd.Run(commandOutput, matches[2])
 			}
 		}
 	}

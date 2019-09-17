@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"github.com/spf13/viper"
 	"github.com/tony84727/athena/forgegrpc"
 	"google.golang.org/grpc"
 	"log"
@@ -11,6 +12,15 @@ import (
 )
 
 func main() {
+	viper.SetConfigName("athena")
+	viper.AddConfigPath(".")
+	viper.AddConfigPath(os.Getenv("BUILD_WORKSPACE_DIRECTORY"))
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			log.Println("error on load config")
+			log.Println(err)
+		}
+	}
 	client, err := grpc.Dial("localhost:30000", grpc.WithInsecure())
 	if err != nil {
 		log.Fatal(err)

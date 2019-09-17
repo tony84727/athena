@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Knetic/govaluate"
 	"github.com/gempir/go-twitch-irc"
@@ -14,6 +15,13 @@ import (
 type CCommand struct {
 }
 
+type EmptyParameter struct {
+}
+
+func (EmptyParameter) Get(name string) (interface{}, error) {
+	return nil,errors.New("unknown")
+}
+
 func (CCommand) Run(out chan<- string, args string) {
 	defer close(out)
 	exprStr := strings.TrimSpace(args)
@@ -24,7 +32,7 @@ func (CCommand) Run(out chan<- string, args string) {
 		log.Println(err.Error())
 		return
 	}
-	result, err := expr.Eval(nil)
+	result, err := expr.Eval(EmptyParameter{})
 	if err != nil {
 		out <- "[計算模組]無法計算 " + exprStr
 		log.Printf("fail to evaluate the expression %s", exprStr)
