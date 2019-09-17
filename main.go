@@ -22,7 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	out := make(chan string, 10)
+	out := make(chan string, 100)
 	defer close(out)
 	go func() {
 		for msg := range out {

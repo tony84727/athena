@@ -47,7 +47,13 @@ go_binary(
 
 go_test(
     name = "go_default_test",
-    srcs = ["math_test.go"],
+    srcs = [
+        "commander_test.go",
+        "math_test.go",
+    ],
     embed = [":go_default_library"],
-    deps = ["@com_github_stretchr_testify//assert:go_default_library"],
+    deps = [
+        "@com_github_stretchr_testify//assert:go_default_library",
+        "@com_github_stretchr_testify//suite:go_default_library",
+    ],
 )

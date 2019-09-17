@@ -2,7 +2,7 @@ package main
 
 import "regexp"
 
-var commandPattern = regexp.MustCompile(`^!(\S+)\s+(.*)`)
+var commandPattern = regexp.MustCompile(`^!(\S+)\s*(.*)`)
 
 type Command interface {
 	Run(out chan<-string, args string)
@@ -22,11 +22,15 @@ func (c *Commander) RegisterCommand(name string, command Command) {
 	c.commands[name] = command
 }
 
+func (c Commander) matchMessage(message string) []string {
+	return commandPattern.FindStringSubmatch(message)
+}
+
 func (c *Commander) Run(input <-chan string, out chan<- string) {
 	for message := range input {
-		matches := commandPattern.FindStringSubmatch(message)
+		matches := c.matchMessage(message)
 		if matches != nil {
-			cmd, exist := c.commands[matches[0]]
+			cmd, exist := c.commands[matches[1]]
 			if exist {
 				commandOutput := make(chan string)
 				go func() {
@@ -36,7 +40,7 @@ func (c *Commander) Run(input <-chan string, out chan<- string) {
 				}()
 				go func() {
 					defer close(commandOutput)
-					cmd.Run(out, matches[1])
+					cmd.Run(out, matches[2])
 				}()
 			}
 		}
