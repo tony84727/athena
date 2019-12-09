@@ -25,7 +25,8 @@
     "@types/node": "^12.7.5",
     "husky": "^3.0.5",
     "prettier": "^1.18.2",
-    "typescript": "^3.6.3"
+    "typescript": "^3.6.3",
+    "serialize-javascript": ">=2.1.1"
   },
   "lint-staged": {
     "*.{ts,tsx,js,css,md}": [
